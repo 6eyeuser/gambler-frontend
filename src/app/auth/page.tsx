@@ -75,7 +75,7 @@ export default function AuthPage() {
         {step === "FORM" ? (
           <>
             <a 
-              href="http://localhost:8080/api/v1/auth/google"
+              href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`}
               className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-200 text-black font-bold py-3 rounded-xl transition-colors mb-6 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
