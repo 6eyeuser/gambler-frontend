@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Disable standalone tracing on Vercel to avoid the missing nft.json bug
-  output: process.env.VERCEL ? undefined : 'standalone',
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://gambler-backend-production-b2fe.up.railway.app/api/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

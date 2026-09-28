@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://gambler-backend-production-b2fe.up.railway.app",
+  baseURL: "/api/v1", // Proxied seamlessly by Next.js rewrites
   withCredentials: true,
 });
