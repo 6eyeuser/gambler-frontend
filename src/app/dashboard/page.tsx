@@ -32,15 +32,23 @@ export default function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Catch token from Google OAuth redirect query param and save to localStorage
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get("token");
-    if (urlToken) {
-      localStorage.setItem("token", urlToken);
-      window.history.replaceState({}, "", "/dashboard");
-    }
+    const initializeDashboard = async () => {
+      // 1. Check URL parameters for Google OAuth token and store it
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get("token");
+      if (urlToken) {
+        localStorage.setItem("token", urlToken);
+        window.history.replaceState({}, "", "/dashboard");
+      }
 
-    const fetchBets = async () => {
+      // 2. Ensure a token actually exists locally before firing requests
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/auth");
+        return;
+      }
+
+      // 3. Safely fetch data with headers now attached via interceptor
       try {
         const res = await api.get("/api/v1/sports/bets");
         setBets(res.data.data);
@@ -54,7 +62,8 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-    fetchBets();
+
+    initializeDashboard();
   }, [router]);
 
   const getGuessName = (guess: string, match: Match) => {
