@@ -28,7 +28,11 @@ export default function AuthPage() {
     setLoading(true);
     try {
       if (isLogin) {
-        await api.post("/auth/login", { email, password });
+        const res = await api.post("/auth/login", { email, password });
+        // CRITICAL: Save token to localStorage as fallback for cross-site cookie restrictions
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token);
+        }
         router.push("/dashboard");
       } else {
         await api.post("/auth/register", { email, password });
@@ -46,7 +50,11 @@ export default function AuthPage() {
     setError("");
     setLoading(true);
     try {
-      await api.post("/auth/verify-otp", { email, otp });
+      const res = await api.post("/auth/verify-otp", { email, otp });
+      // CRITICAL: Save token to localStorage upon successful OTP verification
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid OTP.");
