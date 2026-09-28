@@ -48,9 +48,9 @@ export default function Dashboard() {
         return;
       }
 
-      // 3. Safely fetch data with headers now attached via interceptor
+      // 3. Safely fetch data using relative path (Axios handles the /api/v1 base)
       try {
-        const res = await api.get("/api/v1/sports/bets");
+        const res = await api.get("/sports/bets");
         setBets(res.data.data);
       } catch (err: any) {
         if (err.response?.status === 401) {
