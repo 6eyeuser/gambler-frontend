@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
-  withCredentials: true, // Crucial: Sends cookies across Vercel and Railway cross-origin requests
+  baseURL: "https://gambler-backend-production-b2fe.up.railway.app",
+  withCredentials: true,
 });
