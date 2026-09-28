@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "../../../lib/axios";
 import Navbar from "../../../components/Navbar";
-import { Coins, Bomb, Gem, Trophy, X, CheckCircle2, Zap, Flame } from "lucide-react";
+import { Coins, Bomb, Gem, X, CheckCircle2, Flame } from "lucide-react";
 
 export default function MinesPage() {
   const router = useRouter();
@@ -46,7 +46,8 @@ export default function MinesPage() {
     setHitBoom(false);
 
     try {
-      const res = await api.post("http://localhost:8080/api/v1/mines/start", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await api.post(`${backendUrl}/api/v1/mines/start`, {
         userId,
         amount: betAmount,
         minesCount,
@@ -71,7 +72,8 @@ export default function MinesPage() {
     if (!gameStarted || gameOver || revealedTiles.includes(tileIndex) || loading) return;
 
     try {
-      const res = await api.post("http://localhost:8080/api/v1/mines/reveal", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await api.post(`${backendUrl}/api/v1/mines/reveal`, {
         userId,
         tileIndex,
       });
@@ -98,7 +100,8 @@ export default function MinesPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("http://localhost:8080/api/v1/mines/cashout", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await api.post(`${backendUrl}/api/v1/mines/cashout`, {
         userId,
       });
 
@@ -165,7 +168,7 @@ export default function MinesPage() {
       <div className="max-w-[1300px] mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 items-start relative z-10">
         
         {/* LEFT SIDEBAR CONTROLS */}
-        <div className="w-full md:w-[340px] bg-gradient-to-b from-[#131722]/90 to-[#0b0e17]/90 border border-white/10 rounded-3xl flex flex-col shadow-2xl shrink-0 p-6 backdrop-blur-2xl relative">
+        <div className="w-full md:w-[340px] bg-zinc-900/40 border border-white/10 rounded-3xl flex flex-col shadow-2xl shrink-0 p-6 backdrop-blur-2xl relative">
           
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
             <div className="flex items-center gap-2.5 text-amber-400">
@@ -203,7 +206,7 @@ export default function MinesPage() {
                 value={minesCount}
                 onChange={(e) => setMinesCount(Number(e.target.value))}
                 disabled={gameStarted}
-                className="w-full bg-black/50 border border-white/10 rounded-2xl p-4 text-white font-black outline-none disabled:opacity-50 shadow-inner"
+                className="w-full bg-black/50 border border-white/10 rounded-2xl p-4 text-white font-black outline-none disabled:opacity-50 shadow-inner cursor-pointer"
               >
                 {Array.from({ length: 24 }).map((_, i) => (
                   <option key={i + 1} value={i + 1} className="bg-zinc-900 text-white font-bold">
@@ -242,7 +245,7 @@ export default function MinesPage() {
         </div>
 
         {/* RIGHT GAME BOARD (5x5 Grid) */}
-        <div className={`flex-1 bg-gradient-to-b from-[#101420]/90 to-[#090c14]/90 rounded-3xl border ${hitBoom ? 'border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)]' : 'border-white/10 shadow-2xl'} overflow-hidden flex flex-col items-center justify-center min-h-[600px] relative z-10 p-8 backdrop-blur-2xl transition-all duration-300`}>
+        <div className={`flex-1 bg-zinc-900/40 rounded-3xl border ${hitBoom ? 'border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)]' : 'border-white/10 shadow-2xl'} overflow-hidden flex flex-col items-center justify-center min-h-[600px] relative z-10 p-8 backdrop-blur-2xl transition-all duration-300`}>
           
           {/* Cyberpunk Top Stat Bar */}
           {gameStarted && (
@@ -268,14 +271,14 @@ export default function MinesPage() {
               const isRevealed = revealedTiles.includes(index);
               const isMine = minePositions.includes(index);
 
-              let tileStyle = "bg-[#181d2c] border-white/10 hover:border-blue-500/50 hover:bg-[#20273a] hover:scale-[1.03]";
+              let tileStyle = "bg-zinc-800/60 border-white/10 hover:border-blue-500/50 hover:bg-zinc-800 hover:scale-[1.03]";
               
               if (isRevealed) {
                 tileStyle = "bg-blue-600/20 border-blue-500/60 text-blue-400 shadow-[0_0_25px_rgba(59,130,246,0.3)] scale-[1.02]";
               } else if (gameOver && isMine) {
                 tileStyle = "bg-red-600/20 border-red-500/60 text-red-500 shadow-[0_0_25px_rgba(239,68,68,0.3)] animate-pulse";
               } else if (gameOver && !isRevealed && !isMine) {
-                tileStyle = "bg-[#131722]/50 border-white/5 opacity-40";
+                tileStyle = "bg-zinc-900/50 border-white/5 opacity-40";
               }
 
               return (

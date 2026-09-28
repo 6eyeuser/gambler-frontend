@@ -96,7 +96,8 @@ export default function PlinkoPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("http://localhost:8080/api/v1/plinko/bet", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await api.post(`${backendUrl}/api/v1/plinko/bet`, {
         userId,
         amount: betAmount,
         rows,
@@ -106,7 +107,6 @@ export default function PlinkoPage() {
       const { bet } = res.data.data;
       const path = bet.path; 
 
-      // Instantly deduct bet for smooth multi-ball dropping
       setBalance(prev => prev - betAmount);
 
       const dropId = `drop_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -153,7 +153,6 @@ export default function PlinkoPage() {
         setDrops((prev) => prev.filter((d) => d.id !== dropId));
         setActiveBuckets((prev) => ({ ...prev, [finalIndex]: (prev[finalIndex] || 0) + 1 }));
 
-        // Only add payout to visually update balance precisely when the ball hits the bucket
         setBalance(prev => prev + bet.payout);
 
         const hitId = `hit_${Date.now()}`;
@@ -190,37 +189,43 @@ export default function PlinkoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090b14] text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#030305] text-white font-sans overflow-x-hidden relative selection:bg-purple-500 selection:text-white">
+      
+      {/* Background Neon Ambient Glows */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
+
       <Navbar />
 
-      <div className="max-w-[1200px] mx-auto px-4 py-8 flex flex-col md:flex-row gap-6 items-start">
+      <div className="max-w-[1300px] mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 items-start relative z-10">
         
-        <div className="w-full md:w-[320px] bg-[#1a1f2e] border border-white/5 rounded-2xl flex flex-col shadow-2xl shrink-0 p-4 relative z-20">
+        {/* LEFT SIDEBAR CONTROLS */}
+        <div className="w-full md:w-[340px] bg-zinc-900/40 border border-white/10 rounded-3xl flex flex-col shadow-2xl shrink-0 p-6 backdrop-blur-2xl relative">
           
-          <div className="flex bg-black/40 rounded-xl p-1 mb-6">
+          <div className="flex bg-black/50 rounded-2xl p-1.5 mb-6 border border-white/10 shadow-inner">
             <button 
               onClick={() => setMode("Manual")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === "Manual" ? "bg-blue-600 text-white shadow" : "text-zinc-500 hover:text-white"}`}
+              className={`flex-1 py-2.5 text-xs font-black rounded-xl transition-all ${mode === "Manual" ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]" : "text-zinc-400 hover:text-white"}`}
             >
               Manual
             </button>
             <button 
               onClick={() => setMode("Auto")}
-              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mode === "Auto" ? "bg-blue-600 text-white shadow" : "text-zinc-500 hover:text-white"}`}
+              className={`flex-1 py-2.5 text-xs font-black rounded-xl transition-all ${mode === "Auto" ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]" : "text-zinc-400 hover:text-white"}`}
             >
               Auto
             </button>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Risk</div>
-              <div className="flex bg-black/40 rounded-lg p-1">
+              <div className="text-[11px] text-zinc-400 font-black uppercase tracking-wider mb-2">Risk Level</div>
+              <div className="flex bg-black/50 rounded-2xl p-1.5 border border-white/10 shadow-inner">
                 {["Low", "Medium", "High"].map((r) => (
                   <button
                     key={r}
                     onClick={() => setRisk(r as any)}
-                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${risk === r ? "bg-blue-600 text-white" : "text-zinc-400 hover:text-white"}`}
+                    className={`flex-1 py-2 text-xs font-black rounded-xl transition-all ${risk === r ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-zinc-400 hover:text-white"}`}
                   >
                     {r}
                   </button>
@@ -229,13 +234,13 @@ export default function PlinkoPage() {
             </div>
 
             <div>
-              <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Rows ({rows})</div>
-              <div className="grid grid-cols-5 gap-1 bg-black/40 p-1.5 rounded-lg">
+              <div className="text-[11px] text-zinc-400 font-black uppercase tracking-wider mb-2">Rows ({rows})</div>
+              <div className="grid grid-cols-5 gap-1.5 bg-black/50 p-2 rounded-2xl border border-white/10 shadow-inner">
                 {[8, 9, 10, 11, 12, 13, 14, 15, 16].map((num) => (
                   <button
                     key={num}
                     onClick={() => { if(drops.length === 0) setRows(num) }}
-                    className={`h-7 rounded-md flex items-center justify-center text-xs font-bold transition-all ${rows === num ? "bg-blue-600 text-white shadow" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"} ${drops.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`h-9 rounded-xl flex items-center justify-center text-xs font-black transition-all ${rows === num ? "bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-zinc-400 hover:bg-white/5 hover:text-white"} ${drops.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {num}
                   </button>
@@ -244,17 +249,17 @@ export default function PlinkoPage() {
             </div>
 
             <div>
-              <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Bet Amount (₹)</div>
-              <div className="flex bg-black/40 rounded-lg p-1 relative border border-white/5">
+              <div className="text-[11px] text-zinc-400 font-black uppercase tracking-wider mb-2">Bet Amount (₹)</div>
+              <div className="flex bg-black/50 rounded-2xl p-1.5 relative border border-white/10 shadow-inner">
                 <input
                   type="number"
                   value={betAmount}
                   onChange={(e) => setBetAmount(Number(e.target.value))}
-                  className="w-full bg-transparent text-white font-bold p-2 outline-none pl-3"
+                  className="w-full bg-transparent text-white font-black p-2.5 outline-none pl-3 text-lg"
                 />
-                <div className="flex gap-1 p-1">
-                  <button onClick={() => setBetAmount(prev => Math.max(1, prev / 2))} className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold px-3 rounded">/2</button>
-                  <button onClick={() => setBetAmount(prev => prev * 2)} className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold px-3 rounded">x2</button>
+                <div className="flex gap-1 items-center">
+                  <button onClick={() => setBetAmount(prev => Math.max(1, prev / 2))} className="bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-black px-3 py-2 rounded-xl transition-all">/2</button>
+                  <button onClick={() => setBetAmount(prev => prev * 2)} className="bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-black px-3 py-2 rounded-xl transition-all">2x</button>
                 </div>
               </div>
             </div>
@@ -262,24 +267,26 @@ export default function PlinkoPage() {
             <button
               onClick={handlePlay}
               disabled={loading || !userId}
-              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-black py-4 rounded-xl transition-all shadow-[0_4px_0_rgb(29,78,216)] active:translate-y-[4px] active:shadow-none text-lg tracking-wide disabled:opacity-50 mt-4"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white font-black py-4 rounded-2xl transition-all shadow-[0_0_25px_rgba(59,130,246,0.3)] text-lg tracking-wide disabled:opacity-50 mt-4"
             >
-              {loading ? "..." : "BET"}
+              {loading ? "PROCESSING..." : "BET"}
             </button>
 
-            <div className="flex items-center justify-center gap-2 text-zinc-400 pt-2 border-t border-white/5">
-              <Coins className="w-4 h-4 text-yellow-500" />
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Balance:</span>
-              <span className="font-black text-white">₹{balance.toFixed(2)}</span>
+            <div className="flex items-center justify-between pt-4 border-t border-white/10 text-zinc-400">
+              <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Coins className="w-4 h-4 text-yellow-500" /> Balance:
+              </span>
+              <span className="font-black text-white text-base">₹{balance.toFixed(2)}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 bg-[#121624] rounded-2xl border border-white/5 shadow-2xl overflow-hidden flex items-center justify-center min-h-[600px] relative z-10">
+        {/* RIGHT GAME BOARD */}
+        <div className="flex-1 bg-zinc-900/45 rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex items-center justify-center min-h-[620px] relative z-10 backdrop-blur-2xl">
           
           <style dangerouslySetInnerHTML={{ __html: drops.map(d => d.keyframes).join("\n") }} />
 
-          <h1 className="absolute top-10 left-1/2 -translate-x-1/2 text-[120px] font-black text-white/[0.02] tracking-tighter select-none pointer-events-none">
+          <h1 className="absolute top-10 left-1/2 -translate-x-1/2 text-[120px] font-black text-white/[0.015] tracking-tighter select-none pointer-events-none">
             PLINKO
           </h1>
 
@@ -299,7 +306,7 @@ export default function PlinkoPage() {
             {buckets.map((bucket) => (
               <div 
                 key={bucket.index}
-                className={`absolute h-8 rounded-md flex items-center justify-center text-[10px] font-black border-b-[3px] transition-all duration-100 ${getBucketColor(bucket.index, (activeBuckets[bucket.index] || 0) > 0)}`}
+                className={`absolute h-8 rounded-xl flex items-center justify-center text-[10px] font-black border-b-[3px] transition-all duration-100 ${getBucketColor(bucket.index, (activeBuckets[bucket.index] || 0) > 0)}`}
                 style={{ 
                   left: `${bucket.x - bucketWidth / 2}px`, 
                   top: `${bucket.y - 16}px`,
@@ -328,7 +335,7 @@ export default function PlinkoPage() {
               return (
                 <div 
                   key={hit.id}
-                  className={`absolute z-30 pointer-events-none font-black text-xl animate-out fade-out slide-out-to-top-8 duration-1000 ${hit.payout > betAmount ? 'text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.8)]' : 'text-zinc-500'}`}
+                  className={`absolute z-30 pointer-events-none font-black text-xl animate-out fade-out slide-out-to-top-8 duration-1000 ${hit.payout > betAmount ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]' : 'text-zinc-500'}`}
                   style={{
                     left: `${bucket.x}px`,
                     top: `${bucket.y - 30}px`,
