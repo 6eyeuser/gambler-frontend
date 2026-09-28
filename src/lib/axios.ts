@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "/api/v1", // Proxied seamlessly by Next.js rewrites
-  withCredentials: true,
+  baseURL: "https://gambler-backend-production-b2fe.up.railway.app",
+  withCredentials: true, // CRITICAL: This tells the browser to attach your HttpOnly cookie across domains
 });

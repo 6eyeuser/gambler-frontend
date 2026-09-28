@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "../../lib/axios";
 import Navbar from "../../components/Navbar";
 import { Receipt, Clock, CheckCircle2, XCircle, TrendingUp, AlertCircle } from "lucide-react";
 
@@ -31,25 +32,24 @@ export default function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Catch token from Google OAuth redirect query param and save to localStorage
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    if (urlToken) {
+      localStorage.setItem("token", urlToken);
+      window.history.replaceState({}, "", "/dashboard");
+    }
+
     const fetchBets = async () => {
       try {
-        // Absolute fetch with credentials enabled to send the HttpOnly cookie securely across domains
-        const res = await fetch("https://gambler-backend-production-b2fe.up.railway.app/api/v1/sports/bets", {
-          credentials: "include",
-        });
-        
-        const data = await res.json();
-        if (!res.ok) {
-          if (res.status === 401) {
-            router.push("/auth");
-            return;
-          }
-          throw new Error(data.message || "Failed to load bet history.");
-        }
-        
-        setBets(data.data);
+        const res = await api.get("/api/v1/sports/bets");
+        setBets(res.data.data);
       } catch (err: any) {
-        setError(err.message || "Failed to load bet history.");
+        if (err.response?.status === 401) {
+          router.push("/auth");
+          return;
+        }
+        setError(err.response?.data?.message || "Failed to load bet history.");
       } finally {
         setLoading(false);
       }
@@ -74,7 +74,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#030305] text-white font-sans selection:bg-purple-500 selection:text-white relative overflow-x-hidden">
       
-      {/* Background Ambient Glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
 
