@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "../../lib/axios";
 import Navbar from "../../components/Navbar";
 import { Receipt, Clock, CheckCircle2, XCircle, TrendingUp, AlertCircle } from "lucide-react";
 
@@ -34,11 +33,17 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchBets = async () => {
       try {
-        // FIXED: Use relative path so Axios instance preserves withCredentials cookie headers
-        const res = await api.get("/sports/bets");
-        setBets(res.data.data);
+        // Direct absolute fetch with credentials to guarantee proper domain hitting
+        const res = await fetch("https://gambler-backend-production-b2fe.up.railway.app/api/v1/sports/bets", {
+          credentials: "include",
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to load bet history.");
+        
+        setBets(data.data);
       } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load bet history.");
+        setError(err.message || "Failed to load bet history.");
       } finally {
         setLoading(false);
       }
@@ -63,7 +68,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#030305] text-white font-sans selection:bg-purple-500 selection:text-white relative overflow-x-hidden">
       
-      {/* Background Ambient Glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
 
