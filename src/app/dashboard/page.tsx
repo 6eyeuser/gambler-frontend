@@ -34,8 +34,8 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchBets = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-        const res = await api.get(`${backendUrl}/api/v1/sports/bets`);
+        // FIXED: Use relative path so Axios instance preserves withCredentials cookie headers
+        const res = await api.get("/sports/bets");
         setBets(res.data.data);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load bet history.");
