@@ -11,11 +11,11 @@ import {
   Play,
   Trophy,
   CreditCard,
-  CircleDashed,
   Rocket,
   ArrowRight,
   Zap,
-  Bomb
+  Bomb,
+  CircleDashed
 } from "lucide-react";
 
 export default function LobbyPage() {
@@ -25,8 +25,7 @@ export default function LobbyPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-        const res = await api.get(`${backendUrl}/api/v1/user/dashboard`);
+        const res = await api.get("/user/dashboard");
         const inrWallet = res.data.data.wallets.find(
           (w: any) => w.currency === "INR"
         );
@@ -65,8 +64,7 @@ export default function LobbyPage() {
         return;
       }
 
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const orderRes = await api.post(`${backendUrl}/api/v1/wallet/razorpay/order`, {
+      const orderRes = await api.post("/wallet/razorpay/order", {
         amount: depositAmount,
       });
       
@@ -86,7 +84,7 @@ export default function LobbyPage() {
         order_id: order.id,
         handler: async function (response: any) {
           try {
-            const verifyRes = await api.post(`${backendUrl}/api/v1/wallet/razorpay/verify`, {
+            const verifyRes = await api.post("/wallet/razorpay/verify", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -144,7 +142,7 @@ export default function LobbyPage() {
       borderColor: "border-red-500/20 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]",
       textColor: "text-red-400",
       badge: "Hot Live",
-      route: "/crash",
+      route: "/casino/crash", // Updated to match /src/app/casino/crash folder structure
       active: true,
     },
     {
@@ -156,7 +154,7 @@ export default function LobbyPage() {
       borderColor: "border-amber-500/20 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
       textColor: "text-amber-400",
       badge: "Arcade",
-      route: "/plinko",
+      route: "/casino/plinko", // Updated to match /src/app/casino/plinko folder structure
       active: true,
     },
     {
@@ -168,7 +166,7 @@ export default function LobbyPage() {
       borderColor: "border-amber-500/20 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
       textColor: "text-amber-400",
       badge: "Arcade",
-      route: "/mines",
+      route: "/casino/mines", // Updated to match /src/app/casino/mines folder structure
       active: true,
     },
     {
@@ -239,8 +237,7 @@ export default function LobbyPage() {
               <button
                 onClick={async () => {
                   try {
-                    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-                    await api.post(`${backendUrl}/api/v1/wallet/deposit`, {
+                    await api.post("/wallet/deposit", {
                       currency: "INR",
                       amount: 10000,
                     });
