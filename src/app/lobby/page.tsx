@@ -142,7 +142,7 @@ export default function LobbyPage() {
       borderColor: "border-red-500/20 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]",
       textColor: "text-red-400",
       badge: "Hot Live",
-      route: "/casino/crash", // Updated to match /src/app/casino/crash folder structure
+      route: "/casino/crash",
       active: true,
     },
     {
@@ -154,7 +154,7 @@ export default function LobbyPage() {
       borderColor: "border-amber-500/20 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
       textColor: "text-amber-400",
       badge: "Arcade",
-      route: "/casino/plinko", // Updated to match /src/app/casino/plinko folder structure
+      route: "/casino/plinko",
       active: true,
     },
     {
@@ -166,7 +166,7 @@ export default function LobbyPage() {
       borderColor: "border-amber-500/20 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]",
       textColor: "text-amber-400",
       badge: "Arcade",
-      route: "/casino/mines", // Updated to match /src/app/casino/mines folder structure
+      route: "/casino/mines",
       active: true,
     },
     {
@@ -237,14 +237,16 @@ export default function LobbyPage() {
               <button
                 onClick={async () => {
                   try {
-                    await api.post("/wallet/deposit", {
+                    const res = await api.post("/wallet/deposit", {
                       currency: "INR",
                       amount: 10000,
                     });
-                    setBalance((b) => b + 10000);
-                  } catch (err) {
-                    console.error(err);
-                    alert("Failed to add demo funds.");
+                    if (res.data) {
+                      setBalance((b) => b + 10000);
+                    }
+                  } catch (err: any) {
+                    console.error("Demo fund error:", err.response || err);
+                    alert(`Failed to add demo funds: ${err.response?.data?.message || err.message}`);
                   }
                 }}
                 className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-zinc-900/80 px-6 py-4 text-sm font-black transition-all hover:bg-zinc-800 hover:border-white/20 active:scale-95"
