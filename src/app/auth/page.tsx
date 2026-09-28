@@ -13,14 +13,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  // Bulletproof Session Check
-  useEffect(() => {
-    api.get("/user/dashboard")
-      .then(() => router.push("/dashboard"))
-      .catch(() => setLoading(false));
-  }, [router]);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +22,6 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         const res = await api.post("/auth/login", { email, password });
-        // CRITICAL: Save token to localStorage as fallback for cross-site cookie restrictions
         if (res.data.token) {
           localStorage.setItem("token", res.data.token);
         }
@@ -51,7 +43,6 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const res = await api.post("/auth/verify-otp", { email, otp });
-      // CRITICAL: Save token to localStorage upon successful OTP verification
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
@@ -63,18 +54,8 @@ export default function AuthPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#030305] flex flex-col items-center justify-center text-white space-y-4">
-        <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-zinc-400 font-medium tracking-wide text-sm">Securing Connection...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#030305] flex items-center justify-center p-4 text-white relative overflow-hidden">
-      {/* Background Ambient Glow Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -99,7 +80,7 @@ export default function AuthPage() {
         {step === "FORM" ? (
           <>
             <a 
-              href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`}
+              href={`https://gambler-backend-production-b2fe.up.railway.app/api/v1/auth/google`}
               className="w-full flex items-center justify-center gap-3 bg-white hover:bg-zinc-100 text-black font-semibold py-3.5 rounded-2xl transition-all duration-200 mb-6 shadow-[0_0_25px_rgba(255,255,255,0.08)] hover:scale-[1.01] active:scale-[0.99]"
             >
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
